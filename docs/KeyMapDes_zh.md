@@ -60,6 +60,8 @@
     - key 要映射的按键码
     - startPos 模拟触摸拖动的开始位置
     - endPos 模拟触摸拖动的结束位置
+    - dragSpeed 拖动移动的速度（范围0-1，默认1.0）。数值越大，移动越快
+    - startDelay 可选的延迟时间（毫秒），在开始拖动移动之前等待指定的时间
 
 - KMT_STEER_WHEEL
     - centerPos 方向盘中心点
@@ -72,5 +74,16 @@
     - upOffset 按下上方向键后模拟拖动到相对centerPos位置水平偏上upOffset处
     - downOffset 按下下方向键后模拟拖动到相对centerPos位置水平偏下downOffset处
     
+## 可视化按键映射工具
 
-    
+现在有一个基于Web的GUI工具可以帮助你直观地创建和管理按键映射：[ScrcpyKeyMapper](https://github.com/w4po/ScrcpyKeyMapper)
+
+![ScrcpyKeyMapper截图](https://raw.githubusercontent.com/w4po/ScrcpyKeyMapper/main/assets/screenshot.png)
+
+你可以使用这个工具来：
+- 直观地创建按键映射
+- 实时测试你的映射
+- 导出映射为JSON文件
+- 导入现有映射进行编辑
+
+在线试用：[ScrcpyKeyMapper网页应用](https://w4po.github.io/ScrcpyKeyMapper)
