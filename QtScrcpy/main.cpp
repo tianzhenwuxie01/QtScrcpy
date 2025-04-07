@@ -55,10 +55,12 @@ int main(int argc, char *argv[])
         QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     }
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
 #endif
 
     QSurfaceFormat varFormat = QSurfaceFormat::defaultFormat();
@@ -113,8 +115,13 @@ int main(int argc, char *argv[])
             "following address:");
     qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion());
 
-    qInfo() << QObject::tr("If you need more professional screen projection control software, you can try the following software:");
-    qInfo() << QString(QObject::tr("QuickMirror") + " <https://lrbnfell4p.feishu.cn/docx/QRMhd9nImorAGgxVLlmczxSdnYf>");
+    qInfo() << QObject::tr("If you need more professional batch control mirror software, you can try the following software:");
+    qInfo() << QString(QObject::tr("QuickMirror") + " <https://lrbnfell4p.feishu.cn/drive/folder/KviYfz5uFlpUT8dXgdjccmfUnse>");
+
+    qInfo() << QObject::tr("If you need more professional game keymap mirror software, you can try the following software:");
+    qInfo() << QString(QObject::tr("QuickAssistant") + " <https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh>");
+
+    qInfo() << QObject::tr("You can contact me with telegram <https://t.me/+Ylf_5V_rDCMyODQ1>");
 
     int ret = a.exec();
     delete g_mainDlg;
@@ -130,7 +137,13 @@ void installTranslator()
     static QTranslator translator;
     QLocale locale;
     QLocale::Language language = locale.language();
-    //language = QLocale::English;
+
+    if (Config::getInstance().getLanguage() == "zh_CN") {
+        language = QLocale::Chinese;
+    } else if (Config::getInstance().getLanguage() == "en_US") {
+        language = QLocale::English;
+    }
+
     QString languagePath = ":/i18n/";
     switch (language) {
     case QLocale::Chinese:
@@ -142,7 +155,10 @@ void installTranslator()
         break;
     }
 
-    translator.load(languagePath);
+    auto loaded = translator.load(languagePath);
+    if (!loaded) {
+        qWarning() << "Failed to load translation file:" << languagePath;
+    }
     qApp->installTranslator(&translator);
 }
 

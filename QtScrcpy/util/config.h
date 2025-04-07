@@ -34,6 +34,7 @@ public:
     static Config &getInstance();
 
     // config
+    QString getLanguage();
     QString getTitle();
     QString getServerVersion();
     int getMaxFps();
@@ -61,6 +62,11 @@ public:
     QRect getRect(const QString &serial);
 
     void deleteGroup(const QString &serial);
+
+    // IP history methods
+    void saveIpHistory(const QString &ip);
+    QStringList getIpHistory(); 
+    void clearIpHistory();
 
 private:
     explicit Config(QObject *parent = nullptr);

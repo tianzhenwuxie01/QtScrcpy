@@ -11,6 +11,9 @@
 #define GROUP_COMMON "common"
 
 // config
+#define COMMON_LANGUAGE_KEY "Language"
+#define COMMON_LANGUAGE_DEF "Auto"
+
 #define COMMON_TITLE_KEY "WindowTitle"
 #define COMMON_TITLE_DEF QCoreApplication::applicationName()
 
@@ -108,15 +111,21 @@
 #define SERIAL_NICK_NAME_KEY "NickName"
 #define SERIAL_NICK_NAME_DEF "Phone"
 
+// IP history
+#define IP_HISTORY_KEY "IpHistory"
+#define IP_HISTORY_DEF ""
+#define IP_HISTORY_MAX 10
+
 QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
 {
     m_settings = new QSettings(getConfigPath() + "/config.ini", QSettings::IniFormat);
-    m_settings->setIniCodec("UTF-8");
-
     m_userData = new QSettings(getConfigPath() + "/userdata.ini", QSettings::IniFormat);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    m_settings->setIniCodec("UTF-8");
     m_userData->setIniCodec("UTF-8");
+#endif
 
     qDebug()<<m_userData->childGroups();
 }
@@ -363,6 +372,15 @@ void Config::deleteGroup(const QString &serial)
     m_userData->remove(serial);
 }
 
+QString Config::getLanguage()
+{
+    QString language;
+    m_settings->beginGroup(GROUP_COMMON);
+    language = m_settings->value(COMMON_LANGUAGE_KEY, COMMON_LANGUAGE_DEF).toString();
+    m_settings->endGroup();
+    return language;
+}
+
 QString Config::getTitle()
 {
     QString title;
@@ -370,4 +388,35 @@ QString Config::getTitle()
     title = m_settings->value(COMMON_TITLE_KEY, COMMON_TITLE_DEF).toString();
     m_settings->endGroup();
     return title;
+}
+
+void Config::saveIpHistory(const QString &ip)
+{
+    QStringList ipList = getIpHistory();
+    
+    // 移除已存在的相同IP（避免重复）
+    ipList.removeAll(ip);
+    
+    // 将新IP添加到开头
+    ipList.prepend(ip);
+    
+    // 限制历史记录数量
+    while (ipList.size() > IP_HISTORY_MAX) {
+        ipList.removeLast();
+    }
+    
+    m_userData->setValue(IP_HISTORY_KEY, ipList);
+    m_userData->sync();
+}
+
+QStringList Config::getIpHistory()
+{
+    QStringList ipList = m_userData->value(IP_HISTORY_KEY, IP_HISTORY_DEF).toStringList();
+    return ipList;
+}
+
+void Config::clearIpHistory()
+{
+    m_userData->remove(IP_HISTORY_KEY);
+    m_userData->sync();
 }
